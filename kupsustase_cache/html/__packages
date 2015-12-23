@@ -1,0 +1,7 @@
+base
+jsonlite
+dplyr
+knitr
+tidyjson
+reshape2
+data.table

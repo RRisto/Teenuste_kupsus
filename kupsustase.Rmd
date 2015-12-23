@@ -5,6 +5,273 @@ date: "22. detsember 2015"
 output: html_document
 ---
 ##Sissejuhatus
+```{r, echo=FALSE, warning=FALSE, cache=TRUE, eval=FALSE}
+#laiad andmed sisse
+fromJsonLong=function(andmedJson) {
+  library(tidyjson)
+  library(dplyr)
+  andmedWide=andmedJson %>% 
+    as.tbl_json %>% 
+    gather_array %>% 
+    spread_values(
+      #üldandmed
+      'createdAt'=jstring('createdAt'),
+      'objectId'=jstring('objectId'),
+      'updatedAt'=jstring('updatedAt'),
+      'keel'=jstring('keel'),
+      'nimetus'=jstring('nimetus'),
+      'eluarisyndmus'=jstring('eluarisyndmus'),
+      'identifikaator'=jstring('identifikaator'),
+      'kirjeldus'=jstring('kirjeldus'),
+      'tegevusvaldkond'=jstring('tegevusvaldkond'),
+      'teenusetyyp'=jstring('teenusetyyp'),
+      'ministeerium'=jstring('ministeerium'),
+      'allasutus'=jstring('allasutus'),
+      'osakondyksus'=jstring('osakondyksus'),
+      'omanikunimi'=jstring('omanikunimi'),
+      'omanikuamet'=jstring('omanikuamet'),
+      'omanikutelefon'=jstring('omanikutelefon'),
+      'omanikuemail'=jstring('omanikuemail'),
+      'konfinfo'=jstring('konfinfo'),
+      #'eeltingimus'=jstring('eeltingimus'),
+      #'jareltingimus'=jstring('jareltingimus'), #kui liiga pikk tekitab jama
+      'seotuddokumendid'=jstring('seotuddokumendid'),
+      'muudatustvajav'=jstring('muudatustvajav'),
+      'aegumisekpv'=jstring('aegumisekpv'),
+      'funktsioon'=jstring('funktsioon'),
+      'veebiaadress'=jstring('veebiaadress'),
+      'makse'=jstring('makse'),
+      'seisund'=jstring('seisund'),
+      'sihtgrupp'=jstring('sihtgrupp'),
+      'regulatsioon'=jstring('regulatsioon'),
+      #statistika
+      'empty.Veebileht / portaal.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Veebileht / portaal','osutamistearv'),
+      'empty.Veebileht / portaal.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Veebileht / portaal','rahulolu'),
+      'empty.Veebileht / portaal.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Veebileht / portaal','halduskulu'),
+      'empty.Veebileht / portaal.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Veebileht / portaal','ajakulu'),
+      'empty.E-iseteenindus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-iseteenindus','osutamistearv'),
+      'empty.E-iseteenindus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-iseteenindus','rahulolu'),
+      'empty.E-iseteenindus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-iseteenindus','halduskulu'),
+      'empty.E-iseteenindus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-iseteenindus','ajakulu'),
+      'empty.Eesti.ee.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Eesti.ee','osutamistearv'),
+      'empty.Eesti.ee.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Eesti.ee','rahulolu'),
+      'empty.Eesti.ee.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Eesti.ee','halduskulu'),
+      'empty.Eesti.ee.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Eesti.ee','ajakulu'),
+      'empty.Nutirakendus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Nutirakendus','osutamistearv'),
+      'empty.Nutirakendus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Nutirakendus','rahulolu'),
+      'empty.Nutirakendus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Nutirakendus','halduskulu'),
+      'empty.Nutirakendus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Nutirakendus','ajakulu'),
+      'empty.Digitelevisioon.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Digitelevisioon','osutamistearv'),
+      'empty.Digitelevisioon.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Digitelevisioon','rahulolu'),
+      'empty.Digitelevisioon.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Digitelevisioon','halduskulu'),
+      'empty.Digitelevisioon.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Digitelevisioon','ajakulu'),
+      'empty.E-post.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-post','osutamistearv'),
+      'empty.E-post.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-post','rahulolu'),
+      'empty.E-post.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-post','halduskulu'),
+      'empty.E-post.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','E-post','ajakulu'),
+      'empty.Tekstisõnum.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Tekstisõnum','osutamistearv'),
+      'empty.Tekstisõnum.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Tekstisõnum','rahulolu'),
+      'empty.Tekstisõnum.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Tekstisõnum','halduskulu'),
+      'empty.Tekstisõnum.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Tekstisõnum','ajakulu'),
+      'empty.Telefon.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Telefon','osutamistearv'),
+      'empty.Telefon.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Telefon','rahulolu'),
+      'empty.Telefon.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Telefon','halduskulu'),
+      'empty.Telefon.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Telefon','ajakulu'),
+      'empty.Faks.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Faks','osutamistearv'),
+      'empty.Faks.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Faks','rahulolu'),
+      'empty.Faks.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Faks','halduskulu'),
+      'empty.Faks.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Faks','ajakulu'),
+      'empty.Post.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Post','osutamistearv'),
+      'empty.Post.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Post','rahulolu'),
+      'empty.Post.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Post','halduskulu'),
+      'empty.Post.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Post','ajakulu'),
+      'empty.Letiteenus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Letiteenus büroos','osutamistearv'),
+      'empty.Letiteenus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Letiteenus büroos','rahulolu'),
+      'empty.Letiteenus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Letiteenus büroos','halduskulu'),
+      'empty.Letiteenus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Letiteenus büroos','ajakulu'),
+      'empty.Kliendi juures.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','empty','Kliendi juures','osutamistearv'),
+      'empty.Kliendi juures.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Kliendi juures','rahulolu'),
+      'empty.Kliendi juures.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Kliendi juures','halduskulu'),
+      'empty.Kliendi juures.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','empty','Kliendi juures','ajakulu'),
+      '2014.Veebileht / portaal.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Veebileht / portaal','osutamistearv'),
+      '2014.Veebileht / portaal.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Veebileht / portaal','rahulolu'),
+      '2014.Veebileht / portaal.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Veebileht / portaal','halduskulu'),
+      '2014.Veebileht / portaal.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Veebileht / portaal','ajakulu'),
+      '2014.E-iseteenindus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-iseteenindus','osutamistearv'),
+      '2014.E-iseteenindus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-iseteenindus','rahulolu'),
+      '2014.E-iseteenindus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-iseteenindus','halduskulu'),
+      '2014.E-iseteenindus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-iseteenindus','ajakulu'),
+      '2014.Eesti.ee.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Eesti.ee','osutamistearv'),
+      '2014.Eesti.ee.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Eesti.ee','rahulolu'),
+      '2014.Eesti.ee.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Eesti.ee','halduskulu'),
+      '2014.Eesti.ee.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Eesti.ee','ajakulu'),
+      '2014.Nutirakendus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Nutirakendus','osutamistearv'),
+      '2014.Nutirakendus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Nutirakendus','rahulolu'),
+      '2014.Nutirakendus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Nutirakendus','halduskulu'),
+      '2014.Nutirakendus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Nutirakendus','ajakulu'),
+      '2014.Digitelevisioon.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Digitelevisioon','osutamistearv'),
+      '2014.Digitelevisioon.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Digitelevisioon','rahulolu'),
+      '2014.Digitelevisioon.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Digitelevisioon','halduskulu'),
+      '2014.Digitelevisioon.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Digitelevisioon','ajakulu'),
+      '2014.E-post.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-post','osutamistearv'),
+      '2014.E-post.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-post','rahulolu'),
+      '2014.E-post.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-post','halduskulu'),
+      '2014.E-post.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','E-post','ajakulu'),
+      '2014.Tekstisõnum.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Tekstisõnum','osutamistearv'),
+      '2014.Tekstisõnum.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Tekstisõnum','rahulolu'),
+      '2014.Tekstisõnum.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Tekstisõnum','halduskulu'),
+      '2014.Tekstisõnum.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Tekstisõnum','ajakulu'),
+      '2014.Telefon.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Telefon','osutamistearv'),
+      '2014.Telefon.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Telefon','rahulolu'),
+      '2014.Telefon.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Telefon','halduskulu'),
+      '2014.Telefon.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Telefon','ajakulu'),
+      '2014.Faks.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Faks','osutamistearv'),
+      '2014.Faks.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Faks','rahulolu'),
+      '2014.Faks.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Faks','halduskulu'),
+      '2014.Faks.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Faks','ajakulu'),
+      '2014.Post.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Post','osutamistearv'),
+      '2014.Post.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Post','rahulolu'),
+      '2014.Post.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Post','halduskulu'),
+      '2014.Post.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Post','ajakulu'),
+      '2014.Letiteenus.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Letiteenus büroos','osutamistearv'),
+      '2014.Letiteenus.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Letiteenus büroos','rahulolu'),
+      '2014.Letiteenus.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Letiteenus büroos','halduskulu'),
+      '2014.Letiteenus.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Letiteenus büroos','ajakulu'),
+      '2014.Kliendi juures.osutamistearv'=jnumber('teenuste_kanalid_ja_moodikud','2014','Kliendi juures','osutamistearv'),
+      '2014.Kliendi juures.rahulolu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Kliendi juures','rahulolu'),
+      '2014.Kliendi juures.halduskulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Kliendi juures','halduskulu'),
+      '2014.Kliendi juures.ajakulu'=jnumber('teenuste_kanalid_ja_moodikud','2014','Kliendi juures','ajakulu'),
+      
+      #linkide tabelist
+      'empty.Veebileht / portaal.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Veebileht / portaal','link'),
+      'empty.E-iseteenindus.link'=jstring('teenuste_kanalid_ja_moodikud','empty','E-iseteenindus','link'),
+      'empty.Eesti.ee.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Eesti.ee','link'),
+      'empty.Nutirakendus.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Nutirakendus','link'),
+      'empty.Digitelevisioon.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Digitelevisioon','link'),
+      'empty.E-post.link'=jstring('teenuste_kanalid_ja_moodikud','empty','E-post','link'),
+      'empty.Tekstisõnum.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Tekstisõnum','link'),
+      'empty.Telefon.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Telefon','link'),
+      'empty.Faks.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Faks','link'),
+      'empty.Post.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Post','link'),
+      'empty.Letiteenus.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Letiteenus büroos','link'),
+      'empty.Kliendi juures.link'=jstring('teenuste_kanalid_ja_moodikud','empty','Kliendi juures','link'),
+      '2014.Veebileht / portaal.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Veebileht / portaal','link'),
+      '2014.E-iseteenindus.link'=jstring('teenuste_kanalid_ja_moodikud','2014','E-iseteenindus','link'),
+      '2014.Eesti.ee.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Eesti.ee','link'),
+      '2014.Nutirakendus.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Nutirakendus','link'),
+      '2014.Digitelevisioon.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Digitelevisioon','link'),
+      '2014.E-post.link'=jstring('teenuste_kanalid_ja_moodikud','2014','E-post','link'),
+      '2014.Tekstisõnum.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Tekstisõnum','link'),
+      '2014.Telefon.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Telefon','link'),
+      '2014.Faks.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Faks','link'),
+      '2014.Post.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Post','link'),
+      '2014.Letiteenus.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Letiteenus büroos','link'),
+      '2014.Kliendi juures.link'=jstring('teenuste_kanalid_ja_moodikud','2014','Kliendi juures','link')
+    )
+  #eemaldame sodi
+  andmedWide$document.id=NULL
+  andmedWide$array.index=NULL
+  andmedWide
+}
+#abifuktsioonid andmete sisse lugemiseks ja korrastamiseks
+meltimine=function(kanal, data) {
+  library(reshape2)
+  #leiame ainult seda kanalit puudutavad muutujad
+  sub=data[, grepl(paste(kanal, "|identifikaator|ministeerium|allasutus|tegevusvaldkond|teenusetyyp|makse", sep=""), names(data))]
+  #määran id-d, mis meltimisel meltimata jäävad
+  id=grep(c("identifikaator|ministeerium|allasutus|tegevusvaldkond|teenusetyyp|makse|link"), names(sub), value=T)
+  #kui selle kanali kohta stati pole, anna vastuseks null
+  if(length(id)<=2) {
+    tulem=NULL
+  } else {
+    #meldime andmed kitsaks
+    tulem=melt(sub, id=id)
+    #muudan variable nime ära, mis on kanalispets, muidu ei saa rbindida
+    names(tulem)=c("identifikaator", "tegevusvaldkond", "tyyp", "ministeerium", "allasutus",  
+                   "makse", "link",  "variable",           
+                   "value")
+  }
+  tulem
+}
+#korastaja funktsioon
+korrastaja=function(andmed, eemalda) {
+  library(reshape2)
+  #eemalda - mis osa columnite nimedest tuleb eemdalda
+  names(andmed)=gsub(pattern=eemalda,"" ,names(andmed))
+  #kanalite lõikes meldime
+  veeb=meltimine("Veebileht...portaal.", data=andmed)
+  iseteen=meltimine("E.iseteenindus.", data=andmed)
+  eesti=meltimine("Eesti.ee.", data=andmed)
+  nuti=meltimine("Nutirakendus.", data=andmed)
+  digitv=meltimine("Digitelevisioon.", data=andmed)
+  epost=meltimine("E.post.", data=andmed)
+  sms=meltimine("Tekstisõnum.", data=andmed)
+  telefon=meltimine("Telefon.", data=andmed)
+  faks=meltimine("Faks.", data=andmed)
+  post=meltimine("Post.", data=andmed)
+  lett=meltimine("Letiteenus.", data=andmed) #võib muutuda! vaja ka gsubi siis lisada
+  kodus=meltimine("Kliendi.juures.", data=andmed)
+  #rbindime
+  koos=rbind(veeb, iseteen, eesti, nuti, digitv, epost, sms, telefon, faks, 
+             post, lett, kodus)
+  #leiame kanali ja näitaja
+  #kanal <- strsplit(as.character(koos$variable), split ="\\.\\w{1,}$")
+  #stati saamiseks eemaldame punktid kanali nimedest
+  koos$variable=gsub(".ee.", ".", as.character(koos$variable), fixed=T)
+  #skoos$variable=gsub("Letiteenus.büroos", "Letiteenus", as.character(koos$variable), fixed=T)
+  koos$variable=gsub("E.iseteenindus", "Eiseteenindus", as.character(koos$variable), fixed=T)
+  koos$variable=gsub("E.post", "Epost", as.character(koos$variable), fixed=T)
+  koos$variable=gsub("Veebileht...portaal", "Veebileht", as.character(koos$variable), fixed=T)
+  stat=gsub("Kliendi.juures", "Kliendijuures", as.character(koos$variable), fixed=T)
+
+  #lõikame punktini asja maha
+  stat <- strsplit(stat, split ="\\.")
+  #teeme df-ks
+  df=as.data.frame(stat)
+  #transponeerime
+  df=as.data.frame(t(df))
+  #lisame algsesse andmestikku
+  koos$kanal=df[,1]
+  koos$naitaja=df[,2]
+  #viskame välja tühjad read, kus pole linki
+  koos=koos[!is.na(koos$link),]
+  koos
+}
+
+##############funktsioon, mis ühe käsuga tõmaba andmed sisse ja teeb pikaks
+DataLong=function(url) {
+  andmedLai=fromJsonLong(andmedJson=readLines(url))
+  #kui tahad salvestada:
+  failinimi=paste0(Sys.Date(), "_andmedLai.csv")
+  write.table(andmedLai, failinimi, sep=";", row.names = F)
+  vars=names(andmedLai) %in% c("regulatsioon", "objectId", "eluarisyndmus", "kirjeldus", 
+                               "eeltingimus", "jareltingimus", "createdAt", 
+                               "updatedAt", "keel", "osakondyksus", "omanikunimi", 
+                               "omanikutelefon","omanikuemail", 
+                               "konfinfo", "seotuddokumendid", "seisund", 
+                               "muudatustvajav", "aegumisekpv", "funktsioon", 
+                               "veebiaadress")
+  #eemaldame muutujad
+  andmedLai=andmedLai[,!vars]
+  #aastate põhjal teeme andmed 2-ks (kui aastaid rohkem siis vastavalt sellele
+  #arv muutub)
+  andmedLai2014=andmedLai[, !grepl("empty.", names(andmedLai))]
+  andmedLaiEmpty=andmedLai[, !grepl("X2014.", names(andmedLai))]
+  puhas2014=korrastaja(andmedLai2014, "X2014.")
+  puhasEmpty=korrastaja(andmedLaiEmpty, "empty.")
+  #paneme andme kokku
+  andmedPikk=rbind(puhas2014, puhasEmpty)
+  return(andmedPikk)
+}
+#laiad andmed sisse
+
+#pikad andmed sisse
+andmedLai=fromJsonLong(andmedJson=readLines("https://www.riigiteenused.ee/api/et/all"))
+andmedPikk=DataLong("https://www.riigiteenused.ee/api/et/all")
+#andmete kuupäev
+kell=Sys.time() 
+
+```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #funktsioon laiast formaadist pikaks tegemiseks
@@ -239,4 +506,4 @@ names(OmanikAsutLoikes)=c("Ministeerium", "Allasutus", "Teenuste arv", "Küpsust
 kable(OmanikAsutLoikes)
 ```
 
-Nagu näha võib näha mitmeid asutusi, kes teenuste juhtimine on tasemel 3. Samas tuleb hetkel olla tulemuste suhtes kriitiline, kuna paljudes asutustes on enamik teenuseid kirjeldamata. Kõikide teenuste kirjeldamisel saab adekvaatsema ülevaate, mis teenuste küpsustase. Kui sind huvitab selle artikli tulemuste saamiseks kasutatav R-i kood, kliki siia. 
+Nagu näha võib näha mitmeid asutusi, kes teenuste juhtimine on tasemel 3. Samas tuleb hetkel olla tulemuste suhtes kriitiline, kuna paljudes asutustes on enamik teenuseid kirjeldamata. Kõikide teenuste kirjeldamisel saab adekvaatsema ülevaate, mis teenuste küpsustase. Kui sind huvitab selle artikli tulemuste saamiseks kasutatav R-i kood, kliki [siia](https://github.com/RRisto/Teenuste_kupsus/tree/master "https://github.com/RRisto/Teenuste_kupsus/tree/master"). 
